@@ -35,7 +35,7 @@ def load_user(id):
 
 
 
-@app.route('/api/register', methods=['POST'])      # creates account
+@app.route('/register', methods=['POST'])      # creates account
 def home():
     data = request.get_json()
     hashed_pw = bcrypt.generate_password_hash(data["password"]).decode('utf-8')
@@ -45,7 +45,7 @@ def home():
 
     return jsonify({'message': 'User created successfully'}), 201
 
-@app.route('/api/login', methods=['POST'])     # login
+@app.route('/login', methods=['POST'])     # login
 def login():
     data = request.get_json()
     user = User.query.filter_by(username=data["username"]).first()
@@ -54,13 +54,13 @@ def login():
         return jsonify({'message': 'Login successful'}), 200
     return jsonify({'message': 'Invalid credentials'}), 401
 
-@app.route('/api/get_todo', methods=['GET'])   # get all todos
+@app.route('/get_todo', methods=['GET'])   # get all todos
 @login_required
 def get_todo():
     todo = Todo.query.filter_by(user_id=current_user.id).all()
     return jsonify([{'id': t.id, 'task': t.task, 'status': t.status} for t in todo]), 200     # listcomprehension to convert todos to a list of dictionaries
 
-@app.route('/api/create_todo', methods=['POST'])   # create todo
+@app.route('/create_todo', methods=['POST'])   # create todo
 @login_required
 def create_todo():
     data = request.get_json()
@@ -80,7 +80,7 @@ def create_todo():
     db.session.commit()
     return jsonify({"id":new_todo.id, "task":new_todo.task, "status":new_todo.status}), 201
 
-@app.route('/api/update_todos/<int:id>', methods=['PUT'])   # update todo
+@app.route('/update_todos/<int:id>', methods=['PUT'])   # update todo
 @login_required
 def update_task(id):
     data = request.get_json()
@@ -94,7 +94,7 @@ def update_task(id):
     db.session.commit()
     return jsonify({"id":todo.id, "task":todo.task, "status":todo.status}), 200
 
-@app.route('/api/del_todos/<int:id>', methods=['DELETE'])   # delete todo
+@app.route('/del_todos/<int:id>', methods=['DELETE'])   # delete todo
 @login_required
 def delete_task(id):
     todo = Todo.query.filter_by(id=id, user_id=current_user.id).first()
@@ -110,4 +110,5 @@ def delete_task(id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+
     app.run(debug=True)
